@@ -1,5 +1,41 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from rest_framework import permissions
 
-# Create your views here.
-def index(request):
-    return render(request, 'rank/index.html')
+from .serializers import StudentSerializer, ProgramSerializer, CollegeProgramSerializer, CollegeSerializer
+from .models import College, Program, CollegeProgram, Student
+
+
+class ProgramViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Program.objects.all()
+    serializer_class = ProgramSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class CollegeViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = College.objects.all()
+    serializer_class = CollegeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class CollegeProgramViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = CollegeProgram.objects.all()
+    serializer_class = CollegeProgramSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class StudentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    permission_classes = [permissions.IsAuthenticated]
