@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 
 from .serializers import StudentSerializer, ProgramSerializer, CollegeProgramSerializer, CollegeSerializer
-from .models import College, Program, CollegeProgram, Student
+from .models import College, Program, CollegeProgram, addmission
 
 
 class ProgramViewSet(viewsets.ModelViewSet):
@@ -36,6 +36,6 @@ class StudentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = Student.objects.all()
+    queryset = addmission.objects.all()
     serializer_class = StudentSerializer
     permission_classes = [permissions.IsAuthenticated]
