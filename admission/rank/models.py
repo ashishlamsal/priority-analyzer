@@ -1,17 +1,19 @@
 from django.db import models
 
 # Create your models here.
+
+
 class Program(models.Model):
+    code = models.CharField(max_length=3, primary_key=True)
     name = models.CharField(max_length=256)
-    code = models.CharField(max_length=3)
 
     def __str__(self):
         return f"{self.name} ({self.code})"
 
 
 class College(models.Model):
+    code = models.CharField(max_length=3, primary_key=True)
     name = models.CharField(max_length=256)
-    code = models.CharField(max_length=3)
     programs = models.ManyToManyField(Program, through='CollegeProgram')
 
     def __str__(self):
@@ -19,45 +21,61 @@ class College(models.Model):
 
 
 class CollegeProgram(models.Model):
+    TYPE = (
+        ('R', 'Regular', ),
+        ('F', 'Fullfee', ),
+    )
     college = models.ForeignKey(College, on_delete=models.CASCADE)
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
-    seat = models.PositiveSmallIntegerField()
-    cutoff = models.PositiveSmallIntegerField()
+    seats = models.PositiveSmallIntegerField()
+    cutoff = models.PositiveIntegerField()
+    type = models.CharField(choices=TYPE, max_length=1, default='R')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['college', 'program', 'type'], name='manyToMany')
+        ]
 
     def __str__(self):
-        return f"{self.college.code}, {self.program} -- NoOfSeat={self.seat}"
+        return f"{self.college.code}, {self.program} -- NoOfSeat={self.seats}"
 
 
-class Student(models.Model):
-    QUOTA_REGULAR = 'RE'
-    QUOTA_OTHER = 'OT'
-    QUOTA_CHOICES = [
-        (QUOTA_REGULAR, 'Regular'),
-        (QUOTA_OTHER, 'Other'),
-    ]
-
-    GENDER_MALE = 'M'
-    GENDER_FEMALE = 'F'
+class addmission(models.Model):
     GENDER_CHOICES = (
-        (GENDER_MALE, 'Male', ),
-        (GENDER_FEMALE, 'Female', ),
+        ('M', 'Male', ),
+        ('F', 'Female', ),
     )
 
     first_name = models.CharField(max_length=64)
+    middle_name = models.CharField(max_length=64, null=True)
     last_name = models.CharField(max_length=64)
-    gender = models.CharField(
-        max_length=1,
-        choices=GENDER_CHOICES
-    )
-    details = models.ForeignKey(CollegeProgram, on_delete=models.CASCADE)
+    gender = models.CharField(max_length=1,        choices=GENDER_CHOICES)
     batch = models.PositiveSmallIntegerField()
-    rank = models.PositiveIntegerField()
-    score = models.DecimalField(max_digits=5, decimal_places=2)
-    quota = models.CharField(
-        max_length=2,
-        choices=QUOTA_CHOICES,
-        default=QUOTA_REGULAR,
-    )
+    college = models.ForeignKey(College, on_delete=models.CASCADE)
+    program = models.ForeignKey(Program, on_delete=models.CASCADE)
+
+    QUOTA_NORMAL = 'NOR'
+    QUOTA_DALIT = 'DAL'
+    QUOTA_FEMALE = 'FEM'
+    QUOTA_GOVERNMENT = 'GOV'
+    QUOTA_FOREIGN = 'FOR'
+    QUOTA_TEACHER_STAFF = 'STF'
+    QUOTA_FOREIGN = 'FOR'
+    QUOTA_OTHER = 'OTH'
+    QUOTA_CHOICES = [
+        (QUOTA_NORMAL, 'Normal Quota'),
+        (QUOTA_DALIT, 'Dalit Quota'),
+        (QUOTA_FEMALE, 'Female Quota'),
+        (QUOTA_GOVERNMENT, 'Government Quota'),
+        (QUOTA_FOREIGN, 'Foreign Quota'),
+        (QUOTA_OTHER, 'Other'),
+    ]
+
+    quota = models.CharField(max_length=3,   choices=QUOTA_CHOICES,
+                             default=QUOTA_NORMAL)
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    rank = models.PositiveIntegerField(null=True)
 
     def __str__(self):
-        return f"[{self.rank}] {self.first_name} {self.last_name} ({self.details.college.code} {self.details.program.name}/{self.batch})"
+        return f"[{self.rank}] {self.first_name} {self.middle_name} {self.last_name} {self.college.code} {self.program.name} {self.batch}"
