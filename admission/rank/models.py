@@ -50,7 +50,7 @@ class addmission(models.Model):
     first_name = models.CharField(max_length=64)
     middle_name = models.CharField(max_length=64, null=True)
     last_name = models.CharField(max_length=64)
-    gender = models.CharField(max_length=1,        choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     batch = models.PositiveSmallIntegerField()
     college = models.ForeignKey(College, on_delete=models.CASCADE)
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
