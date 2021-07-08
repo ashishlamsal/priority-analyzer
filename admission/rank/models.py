@@ -14,7 +14,7 @@ class Program(models.Model):
 class College(models.Model):
     code = models.CharField(max_length=3, primary_key=True)
     name = models.CharField(max_length=256)
-    programs = models.ManyToManyField(Program, through='CollegeProgram')
+    programs = models.ManyToManyField(Program, through="CollegeProgram")
 
     def __str__(self):
         return f"{self.name} ({self.code})"
@@ -22,30 +22,43 @@ class College(models.Model):
 
 class CollegeProgram(models.Model):
     TYPE = (
-        ('R', 'Regular', ),
-        ('F', 'Fullfee', ),
+        (
+            "R",
+            "Regular",
+        ),
+        (
+            "F",
+            "Fullfee",
+        ),
     )
     college = models.ForeignKey(College, on_delete=models.CASCADE)
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
     seats = models.PositiveSmallIntegerField()
     cutin = models.PositiveIntegerField(default=0)
     cutoff = models.PositiveIntegerField(default=0)
-    type = models.CharField(choices=TYPE, max_length=1, default='R')
+    type = models.CharField(choices=TYPE, max_length=1, default="R")
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['college', 'program', 'type'], name='manyToMany')
+                fields=["college", "program", "type"], name="manyToMany"
+            )
         ]
 
     def __str__(self):
-        return f"{self.college.code}, {self.program} -- NoOfSeat={self.seats}"
+        return f"{self.college.code}, type={self.type} , cutoff={self.cutoff} , {self.program} -- NoOfSeat={self.seats}"
 
 
 class Addmission(models.Model):
     GENDER_CHOICES = (
-        ('M', 'Male', ),
-        ('F', 'Female', ),
+        (
+            "M",
+            "Male",
+        ),
+        (
+            "F",
+            "Female",
+        ),
     )
 
     first_name = models.CharField(max_length=64)
@@ -55,29 +68,25 @@ class Addmission(models.Model):
     batch = models.PositiveSmallIntegerField()
     collegeprogram = models.ForeignKey(CollegeProgram, on_delete=models.CASCADE)
 
-    QUOTA_NORMAL = 'NOR'
-    QUOTA_DALIT = 'DAL'
-    QUOTA_FEMALE = 'FEM'
-    QUOTA_GOVERNMENT = 'GOV'
-    QUOTA_FOREIGN = 'FOR'
-    QUOTA_TEACHER_STAFF = 'STF'
-    QUOTA_FOREIGN = 'FOR'
-    QUOTA_OTHER = 'OTH'
+    QUOTA_NORMAL = "NOR"
+    QUOTA_DALIT = "DAL"
+    QUOTA_FEMALE = "FEM"
+    QUOTA_GOVERNMENT = "GOV"
+    QUOTA_FOREIGN = "FOR"
+    QUOTA_TEACHER_STAFF = "STF"
+    QUOTA_FOREIGN = "FOR"
+    QUOTA_OTHER = "OTH"
     QUOTA_CHOICES = [
-        (QUOTA_NORMAL, 'Normal Quota'),
-        (QUOTA_DALIT, 'Dalit Quota'),
-        (QUOTA_FEMALE, 'Female Quota'),
-        (QUOTA_GOVERNMENT, 'Government Quota'),
-        (QUOTA_TEACHER_STAFF, 'Teacher/Staff Quota'),
-        (QUOTA_FOREIGN, 'Foreign Quota'),
-        (QUOTA_OTHER, 'Other'),
+        (QUOTA_NORMAL, "Normal Quota"),
+        (QUOTA_DALIT, "Dalit Quota"),
+        (QUOTA_FEMALE, "Female Quota"),
+        (QUOTA_GOVERNMENT, "Government Quota"),
+        (QUOTA_TEACHER_STAFF, "Teacher/Staff Quota"),
+        (QUOTA_FOREIGN, "Foreign Quota"),
+        (QUOTA_OTHER, "Other"),
     ]
 
-    quota = models.CharField(
-        max_length=3,
-        choices=QUOTA_CHOICES,
-        default=QUOTA_NORMAL
-    )
+    quota = models.CharField(max_length=3, choices=QUOTA_CHOICES, default=QUOTA_NORMAL)
     score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     rank = models.PositiveIntegerField(null=True)
 
