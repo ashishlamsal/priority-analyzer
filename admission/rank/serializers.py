@@ -1,30 +1,26 @@
-from .models import College, Program, CollegeProgram, addmission
+from .models import Program, College, CollegeProgram, Addmission
 from rest_framework import serializers
 
 
 class ProgramSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Program
-        fields = '__all__'
-        # fields = ['url', 'username', 'email', 'groups']
+        fields = ['code', 'name']
 
 
 class CollegeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = College
-        fields = '__all__'
-        # fields = ['url', 'name']
+        fields =  ['code', 'name']
 
 
 class CollegeProgramSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CollegeProgram
         fields = '__all__'
-        # fields = ['url', 'username', 'email', 'groups']
 
 
-class StudentSerializer(serializers.HyperlinkedModelSerializer):
+class AddmissionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = addmission
+        model = Addmission
         fields = '__all__'
-        # fields = ['url', 'name']
