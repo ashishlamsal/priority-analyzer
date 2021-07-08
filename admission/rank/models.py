@@ -28,7 +28,8 @@ class CollegeProgram(models.Model):
     college = models.ForeignKey(College, on_delete=models.CASCADE)
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
     seats = models.PositiveSmallIntegerField()
-    cutoff = models.PositiveIntegerField()
+    cutin = models.PositiveIntegerField(default=0)
+    cutoff = models.PositiveIntegerField(default=0)
     type = models.CharField(choices=TYPE, max_length=1, default='R')
 
     class Meta:
@@ -41,7 +42,7 @@ class CollegeProgram(models.Model):
         return f"{self.college.code}, {self.program} -- NoOfSeat={self.seats}"
 
 
-class addmission(models.Model):
+class Addmission(models.Model):
     GENDER_CHOICES = (
         ('M', 'Male', ),
         ('F', 'Female', ),
@@ -52,8 +53,7 @@ class addmission(models.Model):
     last_name = models.CharField(max_length=64)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     batch = models.PositiveSmallIntegerField()
-    college = models.ForeignKey(College, on_delete=models.CASCADE)
-    program = models.ForeignKey(Program, on_delete=models.CASCADE)
+    collegeprogram = models.ForeignKey(CollegeProgram, on_delete=models.CASCADE)
 
     QUOTA_NORMAL = 'NOR'
     QUOTA_DALIT = 'DAL'
@@ -68,14 +68,19 @@ class addmission(models.Model):
         (QUOTA_DALIT, 'Dalit Quota'),
         (QUOTA_FEMALE, 'Female Quota'),
         (QUOTA_GOVERNMENT, 'Government Quota'),
+        (QUOTA_TEACHER_STAFF, 'Teacher/Staff Quota'),
         (QUOTA_FOREIGN, 'Foreign Quota'),
         (QUOTA_OTHER, 'Other'),
     ]
 
-    quota = models.CharField(max_length=3,   choices=QUOTA_CHOICES,
-                             default=QUOTA_NORMAL)
+    quota = models.CharField(
+        max_length=3,
+        choices=QUOTA_CHOICES,
+        default=QUOTA_NORMAL
+    )
     score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     rank = models.PositiveIntegerField(null=True)
 
     def __str__(self):
-        return f"[{self.rank}] {self.first_name} {self.middle_name} {self.last_name} {self.college.code} {self.program.name} {self.batch}"
+        return f"""[{self.rank}] {self.first_name} {self.middle_name} {self.last_name} \
+            {self.collegeprogram.college.code} {self.collegeprogram.program.name} {self.batch}"""

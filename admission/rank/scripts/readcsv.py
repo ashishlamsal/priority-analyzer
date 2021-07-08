@@ -1,10 +1,36 @@
-from rank.models import College, Program, CollegeProgram, addmission
+from rank.models import College, Program, CollegeProgram, Addmission
+import numpy as np
 import csv
 import os
 
 runcolleges = True
 runadmissions = True
 drop = True
+
+def get_cutin_cutoff(RESET = False):
+    '''Updates the cutin and cutoff columns of CollegeProgram Model'''
+    if RESET:
+        for collegeprogram in CollegeProgram.objects.all():
+            collegeprogram.cutoff = 0
+            collegeprogram.save(update_fields=["cutoff"]) 
+
+    else:
+        for collegeprogram in CollegeProgram.objects.all():
+            ranks = Addmission.objects.filter(collegeprogram=collegeprogram).values_list('rank', flat=True).exclude(rank=None)           
+            if not ranks:
+                print(f'BUG : {collegeprogram.college} has insufficient data (DEFAULT=0)')
+                continue
+
+            # find IQR
+            Q1 = np.quantile(ranks,0.25)
+            Q3 = np.quantile(ranks,0.75)
+            IQR = Q3 - Q1
+            
+            # Outliers are values and greater than (Q1+1.5*IQR)
+            collegeprogram.cutin = min(x for x in ranks if x >= (Q1-1.5*IQR))
+            collegeprogram.cutoff = max(x for x in ranks if x <= (Q1+1.5*IQR))
+            collegeprogram.save(update_fields=["cutin", "cutoff"])
+
 
 
 def run():
@@ -19,13 +45,14 @@ def run():
     admissions_table = list(csv.reader(admissionsCSV))
 
     if drop:
-        print("dropping previous information of colleges...")
+        print("dropping previous information of colleges ...")
         College.objects.all().delete()
         Program.objects.all().delete()
         CollegeProgram.objects.all().delete()
-        addmission.objects.all().delete()
-        print("dropped premious information of colleges sucessfully")
+        Addmission.objects.all().delete()
+        print("dropping previous information of colleges ... success!!")
 
+    print("populating College, Program and CollegeProgram Models ...")
     collegeName = ""
     collegeCode = ""
     for row in college_table:
@@ -79,11 +106,13 @@ def run():
                 code=programCode), seats=seats, type=programType)
             cp.save()
 
-        print(programName+"({0})  ".format(programCode) +
-              programType+"  "+str(seats))
+        # print(programName+"({0})  ".format(programCode) +
+        #       programType+"  "+str(seats))
 
     collegeCSV.close()
+    print("populating College, Program and CollegeProgram Models ... success!!")
 
+    print("populating Admission Models ...")
     data = {}
     skip = True
     for row in admissions_table:
@@ -105,6 +134,7 @@ def run():
             data["programName"] = row[4]
 
         data["programCode"] = programNametoCode[data["programName"]]
+        data["programType"] = 'F' if regular_place == -1 else 'R'
         data["quota"] = 'NOR'
         data["first_name"] = row[6]
         data["middle_name"] = row[7]
@@ -116,14 +146,17 @@ def run():
 
         if (runadmissions):
             try:
-                a = addmission(
+                a = Addmission(
                     first_name=data["first_name"],
                     middle_name=data["middle_name"],
                     last_name=data["last_name"],
                     gender=data["gender"],
                     batch=data["batch"],
-                    college=College.objects.get(code=data["collegeCode"]),
-                    program=Program.objects.get(code=data["programCode"]),
+                    collegeprogram=CollegeProgram.objects.get(
+                        college=College.objects.get(code=data["collegeCode"]),
+                        program=Program.objects.get(code=data["programCode"]),
+                        type=data["programType"]
+                    ),
                     quota=data["quota"],
                     score=data["score"],
                     rank=None if data["rank"] == -
@@ -137,8 +170,9 @@ def run():
         # print(data)
 
     admissionsCSV.close()
+    print("populating Admission Models ... success!!")
 
-
-# if __name__ == "__main__":
-
-#     parse_colleges(True, False)
+    print("updating cutoff and cutin rank of CollegeProgram Model ... ")
+    # update cutoff and cutin
+    get_cutin_cutoff()
+    print("updating cutoff and cutin rank of CollegeProgram Model ... success!!")
