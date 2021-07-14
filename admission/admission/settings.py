@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "rank",
     "rest_framework",
     "django_extensions",
+    "django_filters",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
