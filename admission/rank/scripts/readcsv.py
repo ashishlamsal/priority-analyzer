@@ -7,30 +7,36 @@ runcolleges = True
 runadmissions = True
 drop = True
 
-def get_cutin_cutoff(RESET = False):
-    '''Updates the cutin and cutoff columns of CollegeProgram Model'''
+
+def get_cutin_cutoff(RESET=False):
+    """Updates the cutin and cutoff columns of CollegeProgram Model"""
     if RESET:
         for collegeprogram in CollegeProgram.objects.all():
             collegeprogram.cutoff = 0
-            collegeprogram.save(update_fields=["cutoff"]) 
+            collegeprogram.save(update_fields=["cutoff"])
 
     else:
         for collegeprogram in CollegeProgram.objects.all():
-            ranks = Addmission.objects.filter(collegeprogram=collegeprogram).values_list('rank', flat=True).exclude(rank=None)           
+            ranks = (
+                Addmission.objects.filter(collegeprogram=collegeprogram)
+                .values_list("rank", flat=True)
+                .exclude(rank=None)
+            )
             if not ranks:
-                print(f'BUG : {collegeprogram.college} has insufficient data (DEFAULT=0)')
+                print(
+                    f"BUG : {collegeprogram.college} has insufficient data (DEFAULT=0)"
+                )
                 continue
 
             # find IQR
-            Q1 = np.quantile(ranks,0.25)
-            Q3 = np.quantile(ranks,0.75)
+            Q1 = np.quantile(ranks, 0.25)
+            Q3 = np.quantile(ranks, 0.75)
             IQR = Q3 - Q1
-            
-            # Outliers are values and greater than (Q1+1.5*IQR)
-            collegeprogram.cutin = min(x for x in ranks if x >= (Q1-1.5*IQR))
-            collegeprogram.cutoff = max(x for x in ranks if x <= (Q1+1.5*IQR))
-            collegeprogram.save(update_fields=["cutin", "cutoff"])
 
+            # Outliers are values and greater than (Q1+1.5*IQR)
+            collegeprogram.cutin = min(x for x in ranks if x >= (Q1 - 1.5 * IQR))
+            collegeprogram.cutoff = max(x for x in ranks if x <= (Q1 + 1.5 * IQR))
+            collegeprogram.save(update_fields=["cutin", "cutoff"])
 
 
 def run():
@@ -39,8 +45,7 @@ def run():
     programNametoCode = {}
     print(os.getcwd())
     collegeCSV = open("./rank/scripts/datas/colleges.csv", newline="")
-    admissionsCSV = open(
-        "./rank/scripts/datas/filtered_final.csv", newline="")
+    admissionsCSV = open("./rank/scripts/datas/filtered_final.csv", newline="")
     college_table = list(csv.reader(collegeCSV))
     admissions_table = list(csv.reader(admissionsCSV))
 
@@ -68,7 +73,7 @@ def run():
             if collegeName.find("Chitwan") != -1:
                 collegeNametoCode[collegeName] = "CEC"
             collegeCode = collegeNametoCode[collegeName]
-            if (runcolleges):
+            if runcolleges:
                 c = College(name=collegeName, code=collegeCode)
                 c.save()
 
@@ -76,14 +81,14 @@ def run():
             continue
         elif row[0] == "S.No.":
             continue
-        programType = 'F' if row[1].find("Regular") == -1 else 'R'
+        programType = "F" if row[1].find("Regular") == -1 else "R"
         regular_place = row[1].find("Regular")
         fullfee_place = row[1].find("Full Fee")
         programName = ""
         if regular_place != -1:
-            programName = row[1][0:regular_place-1]
+            programName = row[1][0: regular_place - 1]
         elif fullfee_place != -1:
-            programName = row[1][0:fullfee_place-1]
+            programName = row[1][0: fullfee_place - 1]
         else:
             programName = row[1]
 
@@ -96,14 +101,18 @@ def run():
                 print("Program code not found for program:", programName)
         programCode = programNametoCode[programName]
 
-        if (runcolleges):
+        if runcolleges:
             p = Program(name=programName, code=programCode)
             p.save()
 
         seats = int(row[2])
-        if (runcolleges):
-            cp = CollegeProgram(college=College.objects.get(code=collegeCode), program=Program.objects.get(
-                code=programCode), seats=seats, type=programType)
+        if runcolleges:
+            cp = CollegeProgram(
+                college=College.objects.get(code=collegeCode),
+                program=Program.objects.get(code=programCode),
+                seats=seats,
+                type=programType,
+            )
             cp.save()
 
         # print(programName+"({0})  ".format(programCode) +
@@ -121,30 +130,30 @@ def run():
             continue
         data["collegeName"] = row[2]
         data["collegeCode"] = collegeNametoCode[data["collegeName"]]
-        data["programType"] = 'F' if row[4].find("Regular") == -1 else 'R'
+        data["programType"] = "F" if row[4].find("Regular") == -1 else "R"
 
         data["programName"] = ""
         regular_place = row[4].find("Regular")
         fullfee_place = row[4].find("Full Fee")
         if regular_place != -1:
-            data["programName"] = row[4][0:regular_place-1]
+            data["programName"] = row[4][0: regular_place - 1]
         elif fullfee_place != -1:
-            data["programName"] = row[4][0:fullfee_place-1]
+            data["programName"] = row[4][0: fullfee_place - 1]
         else:
             data["programName"] = row[4]
 
         data["programCode"] = programNametoCode[data["programName"]]
-        data["programType"] = 'F' if regular_place == -1 else 'R'
-        data["quota"] = 'NOR'
+        data["programType"] = "F" if regular_place == -1 else "R"
+        data["quota"] = "NOR"
         data["first_name"] = row[6]
         data["middle_name"] = row[7]
         data["last_name"] = row[8]
-        data["gender"] = 'M' if row[12] == "Male" else 'F'
+        data["gender"] = "M" if row[12] == "Male" else "F"
         data["batch"] = 2077
         data["score"] = row[9] if row[9] else -1
         data["rank"] = row[10] if row[10] else -1
 
-        if (runadmissions):
+        if runadmissions:
             try:
                 a = Addmission(
                     first_name=data["first_name"],
@@ -155,15 +164,14 @@ def run():
                     collegeprogram=CollegeProgram.objects.get(
                         college=College.objects.get(code=data["collegeCode"]),
                         program=Program.objects.get(code=data["programCode"]),
-                        type=data["programType"]
+                        type=data["programType"],
                     ),
                     quota=data["quota"],
                     score=data["score"],
-                    rank=None if data["rank"] == -
-                    1 else int(float(data["rank"]))
+                    rank=None if data["rank"] == -1 else int(float(data["rank"])),
                 )
                 a.save()
-            except:
+            except Exception:
                 print(data)
                 raise
 

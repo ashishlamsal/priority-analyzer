@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from django_filters import rest_framework as filters
+from rest_framework.filters import OrderingFilter
 
 from .serializers import (
     ProgramSerializer,
@@ -17,53 +18,70 @@ from .utils import getProbabilityString
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows BE programs to be viewed.
     """
 
     queryset = Program.objects.all()
     serializer_class = ProgramSerializer
+    pagination_class = None
     permission_classes = [permissions.IsAuthenticated]
 
 
 class CollegeViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows colleges to be viewed.
     """
 
     queryset = College.objects.all()
     serializer_class = CollegeSerializer
+    pagination_class = None
     permission_classes = [permissions.IsAuthenticated]
 
 
 class CollegeProgramViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows details of programs within a college to be viewed.
     """
 
     queryset = CollegeProgram.objects.all()
+    filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
+    filterset_fields = (
+        "college",
+        "program",
+        'type',
+    )
+    ordering_fields = (
+        "cutoff",
+    )
     serializer_class = CollegeProgramSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class AddmissionViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows sutdents addmitted to be viewed.
     """
 
     queryset = Addmission.objects.all()
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
     filterset_fields = (
-        "rank",
         "collegeprogram",
         "collegeprogram__college",
         "collegeprogram__program",
         "collegeprogram__type",
+    )
+    ordering_fields = (
+        "rank",
+        "score",
     )
     serializer_class = AddmissionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class Prediction(APIView):
+    """
+    API endpoint that predits the result based on rank provided.
+    """
 
     parser_classes = [MultiPartParser]
     # permission_classes = [permissions.IsAuthenticated]
@@ -105,6 +123,9 @@ class Prediction(APIView):
 
 
 class Analysis(APIView):
+    """
+    API endpoint that for analysis of students data for a college/program.
+    """
     parser_classes = [MultiPartParser]
     # permission_classes = [permissions.IsAuthenticated]
 
@@ -174,7 +195,9 @@ class Analysis(APIView):
                 cutoff = college_program.cutoff
                 seats = college_program.seats
                 type = college_program.type
-                """10 ota leko xa coz tyo rank nai navako data ni raxa database maa so euta matra liyo vane tineru suru maa aauod raxa so 10 ota nikalera rank none xa ki xaina check garera garnu parne vayo aile ko laagi"""
+                """10 ota leko xa coz tyo rank nai navako data ni raxa database maa so euta
+                matra liyo vane tineru suru maa aauod raxa so 10 ota nikalera rank none xa ki
+                xaina check garera garnu parne vayo aile ko laagi"""
                 rankSortedQuery = (
                     Addmission.objects.filter(
                         collegeprogram__program__code__exact=college_program.program.code
@@ -186,7 +209,7 @@ class Analysis(APIView):
                     .order_by("rank")[:10]
                 )
                 for item in rankSortedQuery:
-                    if item.rank != None:
+                    if item.rank is not None:
                         lowestRank = item.rank
                         break
                 resposeData.append(
