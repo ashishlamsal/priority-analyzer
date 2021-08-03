@@ -46,7 +46,12 @@ class CollegeProgram(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.college.code}, type={self.type} , cutoff={self.cutoff} , {self.program} -- NoOfSeat={self.seats}"
+        return (f'{self.college.code}|{self.program.code}|{self.type} '
+                f'(seat={self.seats} | range={self.cutin}-{self.cutoff})'
+                )
+
+    def is_valid_range(self):
+        return self.cutin < self.cutoff
 
 
 class Addmission(models.Model):
@@ -91,5 +96,6 @@ class Addmission(models.Model):
     rank = models.PositiveIntegerField(null=True)
 
     def __str__(self):
-        return f"""[{self.rank}] {self.first_name} {self.middle_name} {self.last_name} \
-            {self.collegeprogram.college.code} {self.collegeprogram.program.name} {self.batch}"""
+        return (f'[{self.rank}] {self.first_name} {self.middle_name} {self.last_name} '
+                f'| {self.collegeprogram.college.code} | {self.collegeprogram.program.name} | {self.batch}'
+                )

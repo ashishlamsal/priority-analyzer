@@ -11,7 +11,7 @@ class ProgramSerializer(serializers.HyperlinkedModelSerializer):
 class CollegeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = College
-        fields =  ['code', 'name']
+        fields = ['code', 'name']
 
 
 class CollegeProgramSerializer(serializers.HyperlinkedModelSerializer):
