@@ -114,6 +114,48 @@ class Analysis(APIView):
         using year for now we will respond result for one college and all faculty
         """
         frontendData = request.data
+        if frontendData["college"] == "All" and frontendData["faculty"] != "All":
+            lowestRank = -1
+            resposeData = []
+            resposeData = []
+            query_result = CollegeProgram.objects.filter(
+                program__code__exact=frontendData["faculty"]
+            )
+
+            for college_program in query_result:
+                """determine lowest, highest and no of seat for each faculty"""
+                program_code = college_program.program.code
+                cutoff = college_program.cutoff
+                seats = college_program.seats
+                type = college_program.type
+                lowestRank = college_program.cutin
+                college = college_program.college.code
+                """10 ota leko xa coz tyo rank nai navako data ni raxa database maa so euta matra liyo vane tineru suru maa aauod raxa so 10 ota nikalera rank none xa ki xaina check garera garnu parne vayo aile ko laagi"""
+                # rankSortedQuery = (
+                #     Addmission.objects.filter(
+                #         collegeprogram__program__code__exact=college_program.program.code
+                #     )
+                #     .filter(collegeprogram__type__exact=type)
+                #     .filter(
+                #         collegeprogram__college__code__exact=frontendData["college"]
+                #     )
+                #     .order_by("rank")[:10]
+                # )
+                # for item in rankSortedQuery:
+                #     if item.rank != None:
+                #         lowestRank = item.rank
+                #         break
+                resposeData.append(
+                    {
+                        "faculty": program_code,
+                        "type": type,
+                        "lowerLimit": lowestRank,
+                        "upperLimit": cutoff,
+                        "seats": seats,
+                        "college": college,
+                    }
+                )
+            return Response(resposeData)
 
         if frontendData["college"] == "All" or frontendData["faculty"] != "All":
             print("Filter should be one college and all faculty")
