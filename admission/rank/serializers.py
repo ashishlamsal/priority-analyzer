@@ -5,13 +5,13 @@ from rest_framework import serializers
 class ProgramSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Program
-        fields = ['code', 'name']
+        fields = ["code", "name"]
 
 
 class CollegeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = College
-        fields = ['code', 'name']
+        fields = ["code", "name"]
 
 
 class CollegeProgramSerializer(serializers.HyperlinkedModelSerializer):
@@ -34,10 +34,23 @@ class CollegeProgramSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = CollegeProgram
-        fields = '__all__'
+        fields = "__all__"
+
+
+class CollegeProgramsListSerializer(serializers.HyperlinkedModelSerializer):
+    programs = serializers.SerializerMethodField()
+
+    def get_programs(self, obj):
+        return {"code": obj["program"], "name": obj["program__name"]}
+
+    class Meta:
+        model = CollegeProgram
+        fields = [
+            "programs",
+        ]
 
 
 class AddmissionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Addmission
-        fields = '__all__'
+        fields = "__all__"

@@ -11,6 +11,7 @@ from .serializers import (
     CollegeSerializer,
     CollegeProgramSerializer,
     AddmissionSerializer,
+    CollegeProgramsListSerializer,
 )
 from .models import Program, College, CollegeProgram, Addmission
 from .utils import getProbabilityString
@@ -24,7 +25,7 @@ class ProgramViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Program.objects.all()
     serializer_class = ProgramSerializer
     pagination_class = None
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
 
 class CollegeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -33,9 +34,10 @@ class CollegeViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     queryset = College.objects.all()
+    filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
     serializer_class = CollegeSerializer
     pagination_class = None
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
 
 class CollegeProgramViewSet(viewsets.ReadOnlyModelViewSet):
@@ -48,13 +50,28 @@ class CollegeProgramViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = (
         "college",
         "program",
-        'type',
+        "type",
     )
-    ordering_fields = (
-        "cutoff",
-    )
+    ordering_fields = ("cutoff",)
     serializer_class = CollegeProgramSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
+
+
+class CollegeProgramsListViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows details of programs within a college to be viewed.
+    """
+
+    queryset = CollegeProgram.objects.values("program", "program__name").distinct()
+    filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
+    filterset_fields = (
+        "college",
+        "program",
+        "type",
+    )
+    serializer_class = CollegeProgramsListSerializer
+    pagination_class = None
+    # permission_classes = [permissions.IsAuthenticated]
 
 
 class AddmissionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -75,7 +92,7 @@ class AddmissionViewSet(viewsets.ReadOnlyModelViewSet):
         "score",
     )
     serializer_class = AddmissionSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
 
 class Prediction(APIView):
@@ -126,6 +143,7 @@ class Analysis(APIView):
     """
     API endpoint that for analysis of students data for a college/program.
     """
+
     parser_classes = [MultiPartParser]
     # permission_classes = [permissions.IsAuthenticated]
 

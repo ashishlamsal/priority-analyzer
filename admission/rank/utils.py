@@ -10,7 +10,6 @@ def getProbabilityString(rank, cutoff, total_seats):
     may represet average of cutoffs of different year
 
     """
-    print("cutoff", cutoff)
     if rank < cutoff - 0.4 * total_seats:
         return "very high"
     elif rank < cutoff - 0.1 * total_seats:
