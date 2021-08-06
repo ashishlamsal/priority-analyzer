@@ -16,7 +16,7 @@ import environ
 
 
 env = environ.Env()
-""" 
+"""
 https://github.com/joke2k/django-environ/issues/76#issuecomment-261798369
 
 """
@@ -36,7 +36,7 @@ SECRET_KEY = "django-insecure-f8btsxm$pp*s(d=+o$5br9xnxd^xrd%8dv(ifxmc_mfmjzboy8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -155,9 +155,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
-    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
 }
 
 CORS_ALLOWED_ORIGINS = [

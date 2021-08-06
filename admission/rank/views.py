@@ -1,5 +1,4 @@
 from rest_framework import viewsets
-from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
@@ -25,7 +24,6 @@ class ProgramViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Program.objects.all()
     serializer_class = ProgramSerializer
     pagination_class = None
-    # permission_classes = [permissions.IsAuthenticated]
 
 
 class CollegeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -37,7 +35,6 @@ class CollegeViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
     serializer_class = CollegeSerializer
     pagination_class = None
-    # permission_classes = [permissions.IsAuthenticated]
 
 
 class CollegeProgramViewSet(viewsets.ReadOnlyModelViewSet):
@@ -55,25 +52,20 @@ class CollegeProgramViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ("cutoff",)
     serializer_class = CollegeProgramSerializer
     pagination_class = None
-    # permission_classes = [permissions.IsAuthenticated]
 
 
 class CollegeProgramsListViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Api endpoint that gvies list of program for given input college
-    TODO:yesma  filterset_fields maa college matra raakhda mileko thyena milaunu xa
+    Api endpoint that gives list of program for given input college
     """
 
     queryset = CollegeProgram.objects.values("program", "program__name").distinct()
-    filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
+    filter_backends = (filters.DjangoFilterBackend,)
     filterset_fields = (
         "college",
-        "program",
-        "type",
     )
     serializer_class = CollegeProgramsListSerializer
     pagination_class = None
-    # permission_classes = [permissions.IsAuthenticated]
 
 
 class AddmissionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -94,7 +86,6 @@ class AddmissionViewSet(viewsets.ReadOnlyModelViewSet):
         "score",
     )
     serializer_class = AddmissionSerializer
-    # permission_classes = [permissions.IsAuthenticated]
 
 
 class Prediction(APIView):
@@ -103,7 +94,6 @@ class Prediction(APIView):
     """
 
     parser_classes = [MultiPartParser]
-    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, format=None):
         """we expect rank, college and faculty filter from the frontend"""
@@ -171,7 +161,9 @@ class Analysis(APIView):
                 type = college_program.type
                 lowestRank = college_program.cutin
                 college = college_program.college.code
-                """10 ota leko xa coz tyo rank nai navako data ni raxa database maa so euta matra liyo vane tineru suru maa aauod raxa so 10 ota nikalera rank none xa ki xaina check garera garnu parne vayo aile ko laagi"""
+                """10 ota leko xa coz tyo rank nai navako data ni raxa database maa so euta
+                matra liyo vane tineru suru maa aauod raxa so 10 ota nikalera rank none xa ki
+                xaina check garera garnu parne vayo aile ko laagi"""
                 # rankSortedQuery = (
                 #     Addmission.objects.filter(
                 #         collegeprogram__program__code__exact=college_program.program.code

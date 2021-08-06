@@ -2,7 +2,6 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-import environ
 
 from django.core.management.commands.runserver import Command as runserver
 
