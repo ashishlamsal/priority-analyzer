@@ -34,7 +34,7 @@ class CollegeProgramSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = CollegeProgram
-        fields = "__all__"
+        fields = ["cutoff", "cutin", "cutoffMarks", "cutinMarks", "seats", "type"]
 
 
 class CollegeProgramsListSerializer(serializers.HyperlinkedModelSerializer):

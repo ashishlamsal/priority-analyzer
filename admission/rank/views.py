@@ -54,12 +54,14 @@ class CollegeProgramViewSet(viewsets.ReadOnlyModelViewSet):
     )
     ordering_fields = ("cutoff",)
     serializer_class = CollegeProgramSerializer
+    pagination_class = None
     # permission_classes = [permissions.IsAuthenticated]
 
 
 class CollegeProgramsListViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows details of programs within a college to be viewed.
+    Api endpoint that gvies list of program for given input college
+    TODO:yesma  filterset_fields maa college matra raakhda mileko thyena milaunu xa
     """
 
     queryset = CollegeProgram.objects.values("program", "program__name").distinct()

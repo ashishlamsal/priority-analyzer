@@ -239,5 +239,5 @@ Thumbs.db
 
 /admission/rank/scripts/datas/
 /test/
-
+.env
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,django

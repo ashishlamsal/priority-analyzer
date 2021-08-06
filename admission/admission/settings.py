@@ -11,6 +11,17 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import environ
+
+
+env = environ.Env()
+""" 
+https://github.com/joke2k/django-environ/issues/76#issuecomment-261798369
+
+"""
+base = environ.Path(__file__) - 2  # two folders back (/a/b/ - 2 = /)
+environ.Env.read_env(env_file=base(".env"))  # reading .env file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -151,4 +162,5 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    os.environ["MY_URL"],
 ]
