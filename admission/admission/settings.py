@@ -16,7 +16,7 @@ import environ
 
 
 env = environ.Env()
-""" 
+"""
 https://github.com/joke2k/django-environ/issues/76#issuecomment-261798369
 
 """
@@ -31,12 +31,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-f8btsxm$pp*s(d=+o$5br9xnxd^xrd%8dv(ifxmc_mfmjzboy8"
+# SECRET_KEY = "django-insecure-f8btsxm$pp*s(d=+o$5br9xnxd^xrd%8dv(ifxmc_mfmjzboy8"
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-f8btsxm$pp*s(d=+o$5br9xnxd^xrd%8dv(ifxmc_mfmjzboy8')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -155,12 +157,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
-    ),
 }
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    os.environ["MY_URL"],
+    os.environ.get('MY_URL', 'http://localhost:3000'),
 ]
