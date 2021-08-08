@@ -4,7 +4,7 @@ from rest_framework.schemas import get_schema_view
 from django.views.generic import TemplateView
 from . import views
 
-router = routers.DefaultRouter()
+router = routers.SimpleRouter()
 router.register(r"programs", views.ProgramViewSet)
 router.register(r"colleges", views.CollegeViewSet)
 router.register(r"collegeprograms", views.CollegeProgramViewSet)
