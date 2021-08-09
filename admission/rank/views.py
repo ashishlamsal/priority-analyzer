@@ -61,9 +61,7 @@ class CollegeProgramsListViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = CollegeProgram.objects.values("program", "program__name").distinct()
     filter_backends = (filters.DjangoFilterBackend,)
-    filterset_fields = (
-        "college",
-    )
+    filterset_fields = ("college",)
     serializer_class = CollegeProgramsListSerializer
     pagination_class = None
 
@@ -120,7 +118,9 @@ class Prediction(APIView):
         for item in query_result:
             singlePrediction = {
                 "college": item.college.code,
+                "college_name": item.college.name,
                 "program": item.program.code,
+                "program_name": item.program.name,
                 "type": item.type,
                 "probablity": getProbabilityString(
                     int(frontendData["rank"]), item.cutoff, item.seats
@@ -161,6 +161,10 @@ class Analysis(APIView):
                 type = college_program.type
                 lowestRank = college_program.cutin
                 college = college_program.college.code
+
+                program_name = college_program.program.name
+                college_name = college_program.college.name
+
                 """10 ota leko xa coz tyo rank nai navako data ni raxa database maa so euta
                 matra liyo vane tineru suru maa aauod raxa so 10 ota nikalera rank none xa ki
                 xaina check garera garnu parne vayo aile ko laagi"""
@@ -186,6 +190,8 @@ class Analysis(APIView):
                         "upperLimit": cutoff,
                         "seats": seats,
                         "college": college,
+                        "program_name": program_name,
+                        "college_name": college_name,
                     }
                 )
             return Response(resposeData)
@@ -207,6 +213,8 @@ class Analysis(APIView):
                 cutoff = college_program.cutoff
                 seats = college_program.seats
                 type = college_program.type
+                program_name = college_program.program.name
+                college_name = college_program.college.name
                 """10 ota leko xa coz tyo rank nai navako data ni raxa database maa so euta
                 matra liyo vane tineru suru maa aauod raxa so 10 ota nikalera rank none xa ki
                 xaina check garera garnu parne vayo aile ko laagi"""
@@ -231,6 +239,8 @@ class Analysis(APIView):
                         "lowerLimit": lowestRank,
                         "upperLimit": cutoff,
                         "seats": seats,
+                        "program_name": program_name,
+                        "college_name": college_name,
                     }
                 )
             return Response(resposeData)

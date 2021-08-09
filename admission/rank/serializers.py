@@ -17,6 +17,14 @@ class CollegeSerializer(serializers.HyperlinkedModelSerializer):
 class CollegeProgramSerializer(serializers.HyperlinkedModelSerializer):
     cutinMarks = serializers.SerializerMethodField()
     cutoffMarks = serializers.SerializerMethodField()
+    college = serializers.SerializerMethodField()
+    program = serializers.SerializerMethodField()
+
+    def get_college(self, obj):
+        return obj.college.name
+
+    def get_program(self, obj):
+        return obj.program.name
 
     def get_cutinMarks(self, obj):
         try:
@@ -34,7 +42,15 @@ class CollegeProgramSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = CollegeProgram
-        fields = ["cutoff", "cutin", "cutoffMarks", "cutinMarks", "seats", "type"]
+        fields = [
+            "cutoff",
+            "cutin",
+            "cutoffMarks",
+            "cutinMarks",
+            "seats",
+            "college",
+            "program",
+        ]
 
 
 class CollegeProgramsListSerializer(serializers.HyperlinkedModelSerializer):
