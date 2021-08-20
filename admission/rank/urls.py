@@ -8,7 +8,7 @@ router = routers.DefaultRouter()
 router.register(r"programs", views.ProgramViewSet)
 router.register(r"colleges", views.CollegeViewSet)
 router.register(r"collegeprograms", views.CollegeProgramViewSet)
-router.register(r"collegeprogramslist", views.CollegeProgramsListViewSet)
+router.register(r"collegeprogramslist", views.CollegeProgramsListViewSet, 'collegeprogramslist')
 router.register(r"admissions", views.AddmissionViewSet)
 
 # Wire up our API using automatic URL routing.

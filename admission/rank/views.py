@@ -66,6 +66,20 @@ class CollegeProgramsListViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
+class RankFilter(filters.FilterSet):
+    min_rank = filters.NumberFilter(field_name="rank", lookup_expr='gte')
+    max_rank = filters.NumberFilter(field_name="rank", lookup_expr='lte')
+
+    class Meta:
+        model = Addmission
+        fields = ["collegeprogram",
+                  "collegeprogram__college",
+                  "collegeprogram__program",
+                  "collegeprogram__type",
+                  'min_rank',
+                  'max_rank']
+
+
 class AddmissionViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows sutdents addmitted to be viewed.
@@ -73,12 +87,7 @@ class AddmissionViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Addmission.objects.all()
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
-    filterset_fields = (
-        "collegeprogram",
-        "collegeprogram__college",
-        "collegeprogram__program",
-        "collegeprogram__type",
-    )
+    filterset_class = RankFilter
     ordering_fields = (
         "rank",
         "score",
