@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from django_filters import rest_framework as filters
 from rest_framework.filters import OrderingFilter
+from django.db.models import Count
 
 from .serializers import (
     ProgramSerializer,
@@ -86,6 +87,7 @@ class AddmissionViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     queryset = Addmission.objects.all()
+
     filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
     filterset_class = RankFilter
     ordering_fields = (
@@ -138,6 +140,36 @@ class Prediction(APIView):
             predictionData.append(singlePrediction)
 
         return Response(predictionData)
+
+
+class Rank(APIView):
+    """
+    API endpoint that gives the data based on range of rank provided.
+    """
+
+    parser_classes = [MultiPartParser]
+
+    def post(self, request, format=None):
+        """we expect rank, college and faculty filter from the frontend"""
+
+        frontendData = request.data
+        min_rank = frontendData['min_rank']
+        max_rank = frontendData['max_rank']
+        college = frontendData['college']
+
+        if college == "All":
+            queryset = Addmission.objects.filter(
+                rank__gte=min_rank,
+                rank__lte=max_rank
+            ).values('collegeprogram__college').annotate(the_count=Count('collegeprogram__college'))
+
+        else:
+            queryset = Addmission.objects.filter(
+                collegeprogram__college__code=college,
+                rank__gte=min_rank, rank__lte=max_rank
+            ).values('collegeprogram__program').annotate(the_count=Count('collegeprogram__program'))
+
+        return Response(queryset)
 
 
 class Analysis(APIView):

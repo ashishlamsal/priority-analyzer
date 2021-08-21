@@ -68,8 +68,9 @@ class CollegeProgramsListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class AddmissionSerializer(serializers.HyperlinkedModelSerializer):
-    collegeprogram = CollegeProgramSerializer(read_only=True, many=False)
+    # collegeprogram = CollegeProgramSerializer(read_only=True, many=False)
 
     class Meta:
         model = Addmission
-        fields = "__all__"
+        # fields = ['score', 'rank', 'collegeprogram']
+        fields = '__all__'

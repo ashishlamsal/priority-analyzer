@@ -18,6 +18,7 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("prediction/", views.Prediction.as_view()),
     path("analysis/", views.Analysis.as_view()),
+    path("rank/", views.Rank.as_view()),
     path(
         "openapi/",
         get_schema_view(
