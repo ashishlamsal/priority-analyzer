@@ -68,17 +68,19 @@ class CollegeProgramsListViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RankFilter(filters.FilterSet):
-    min_rank = filters.NumberFilter(field_name="rank", lookup_expr='gte')
-    max_rank = filters.NumberFilter(field_name="rank", lookup_expr='lte')
+    min_rank = filters.NumberFilter(field_name="rank", lookup_expr="gte")
+    max_rank = filters.NumberFilter(field_name="rank", lookup_expr="lte")
 
     class Meta:
         model = Addmission
-        fields = ["collegeprogram",
-                  "collegeprogram__college",
-                  "collegeprogram__program",
-                  "collegeprogram__type",
-                  'min_rank',
-                  'max_rank']
+        fields = [
+            "collegeprogram",
+            "collegeprogram__college",
+            "collegeprogram__program",
+            "collegeprogram__type",
+            "min_rank",
+            "max_rank",
+        ]
 
 
 class AddmissionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -153,21 +155,27 @@ class Rank(APIView):
         """we expect rank, college and faculty filter from the frontend"""
 
         frontendData = request.data
-        min_rank = frontendData['min_rank']
-        max_rank = frontendData['max_rank']
-        college = frontendData['college']
+        min_rank = frontendData["min_rank"]
+        max_rank = frontendData["max_rank"]
+        college = frontendData["college"]
 
         if college == "All":
-            queryset = Addmission.objects.filter(
-                rank__gte=min_rank,
-                rank__lte=max_rank
-            ).values('collegeprogram__college').annotate(the_count=Count('collegeprogram__college'))
+            queryset = (
+                Addmission.objects.filter(rank__gte=min_rank, rank__lte=max_rank)
+                .values("collegeprogram__college")
+                .annotate(count=Count("collegeprogram__college"))
+            )
 
         else:
-            queryset = Addmission.objects.filter(
-                collegeprogram__college__code=college,
-                rank__gte=min_rank, rank__lte=max_rank
-            ).values('collegeprogram__program').annotate(the_count=Count('collegeprogram__program'))
+            queryset = (
+                Addmission.objects.filter(
+                    collegeprogram__college__code=college,
+                    rank__gte=min_rank,
+                    rank__lte=max_rank,
+                )
+                .values("collegeprogram__program")
+                .annotate(count=Count("collegeprogram__program"))
+            )
 
         return Response(queryset)
 
