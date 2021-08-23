@@ -8,7 +8,9 @@ router = routers.SimpleRouter()
 router.register(r"programs", views.ProgramViewSet)
 router.register(r"colleges", views.CollegeViewSet)
 router.register(r"collegeprograms", views.CollegeProgramViewSet)
-router.register(r"collegeprogramslist", views.CollegeProgramsListViewSet)
+router.register(
+    r"collegeprogramslist", views.CollegeProgramsListViewSet, "collegeprogramslist"
+)
 router.register(r"admissions", views.AddmissionViewSet)
 
 # Wire up our API using automatic URL routing.
@@ -18,6 +20,7 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("prediction/", views.Prediction.as_view()),
     path("analysis/", views.Analysis.as_view()),
+    path("rank/", views.Rank.as_view()),
     path(
         "openapi/",
         get_schema_view(
