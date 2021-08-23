@@ -162,7 +162,7 @@ class Rank(APIView):
         if college == "All":
             queryset = (
                 Addmission.objects.filter(rank__gte=min_rank, rank__lte=max_rank)
-                .values("collegeprogram__college")
+                .values("collegeprogram__college", "collegeprogram__college__name")
                 .annotate(count=Count("collegeprogram__college"))
             )
 
@@ -173,7 +173,11 @@ class Rank(APIView):
                     rank__gte=min_rank,
                     rank__lte=max_rank,
                 )
-                .values("collegeprogram__program")
+                .values(
+                    "collegeprogram__program",
+                    "collegeprogram__college__name",
+                    "collegeprogram__program__name",
+                )
                 .annotate(count=Count("collegeprogram__program"))
             )
 

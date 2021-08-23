@@ -73,4 +73,4 @@ class AddmissionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Addmission
         # fields = ['score', 'rank', 'collegeprogram']
-        fields = '__all__'
+        fields = "__all__"
