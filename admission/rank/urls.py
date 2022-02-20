@@ -21,6 +21,8 @@ urlpatterns = [
     path("prediction/", views.Prediction.as_view()),
     path("analysis/", views.Analysis.as_view()),
     path("rank/", views.Rank.as_view()),
+    path("district/", views.DistrictView.as_view()),
+    path("zone/", views.ZoneView.as_view()),
     path(
         "openapi/",
         get_schema_view(

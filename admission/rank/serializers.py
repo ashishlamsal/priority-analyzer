@@ -1,4 +1,4 @@
-from .models import Program, College, CollegeProgram, Addmission
+from .models import Program, College, CollegeProgram, Addmission, District, Zone
 from rest_framework import serializers
 
 
@@ -67,10 +67,24 @@ class CollegeProgramsListSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class AddmissionSerializer(serializers.HyperlinkedModelSerializer):
+class DistrictSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = District
+        fields = "__all__"
+
+
+class AddmissionSerializer(serializers.ModelSerializer):
     # collegeprogram = CollegeProgramSerializer(read_only=True, many=False)
+    district = DistrictSerializer(many=True, read_only=True)
 
     class Meta:
         model = Addmission
         # fields = ['score', 'rank', 'collegeprogram']
+        fields = "__all__"
+
+
+class ZoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Zone
         fields = "__all__"

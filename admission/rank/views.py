@@ -1,3 +1,4 @@
+from rest_framework.parsers import JSONParser
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -297,3 +298,71 @@ class Analysis(APIView):
                     }
                 )
             return Response(resposeData)
+
+
+class DistrictView(APIView):
+    """
+    API endpoint that gives the data based on location provided.
+    """
+
+    parser_classes = [JSONParser]
+
+    def post(self, request, format=None):
+        """we expect location and year from the frontend"""
+
+        frontendData = request.data
+
+        if frontendData["college"] == "All" and frontendData["faculty"] == "All":
+            query_result = Addmission.objects.all()
+        elif frontendData["college"] == "All":
+            query_result = Addmission.objects.filter(
+                collegeprogram__program__code__exact=frontendData["faculty"]
+            )
+        elif frontendData["faculty"] == "All":
+            query_result = Addmission.objects.filter(
+                collegeprogram__college__code__exact=frontendData["college"]
+            )
+        else:
+
+            query_result = Addmission.objects.filter(
+                collegeprogram__college__code__exact=frontendData["college"]
+            ).filter(collegeprogram__program__code__exact=frontendData["faculty"])
+
+        location = query_result.values('district__code', 'district__name').annotate(
+            count=Count('district__code')).order_by('-count').exclude(district__isnull=True)
+
+        return Response(location)
+
+
+class ZoneView(APIView):
+    """
+    API endpoint that gives the data based on location provided.
+    """
+
+    parser_classes = [JSONParser]
+
+    def post(self, request, format=None):
+        """we expect location and year from the frontend"""
+
+        frontendData = request.data
+
+        if frontendData["college"] == "All" and frontendData["faculty"] == "All":
+            query_result = Addmission.objects.all()
+        elif frontendData["college"] == "All":
+            query_result = Addmission.objects.filter(
+                collegeprogram__program__code__exact=frontendData["faculty"]
+            )
+        elif frontendData["faculty"] == "All":
+            query_result = Addmission.objects.filter(
+                collegeprogram__college__code__exact=frontendData["college"]
+            )
+        else:
+
+            query_result = Addmission.objects.filter(
+                collegeprogram__college__code__exact=frontendData["college"]
+            ).filter(collegeprogram__program__code__exact=frontendData["faculty"])
+
+        location = query_result.values('district__zone__id', 'district__zone__name').annotate(
+            count=Count('district__zone__id')).order_by('-count').exclude(district__zone__isnull=True)
+
+        return Response(location)

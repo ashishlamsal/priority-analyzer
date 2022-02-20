@@ -95,9 +95,26 @@ class Addmission(models.Model):
     quota = models.CharField(max_length=3, choices=QUOTA_CHOICES, default=QUOTA_NORMAL)
     score = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     rank = models.PositiveIntegerField(null=True)
+    district = models.ForeignKey("District", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return (
             f"[{self.rank}] {self.first_name} {self.middle_name} {self.last_name} "
             f"| {self.collegeprogram.college.code} | {self.collegeprogram.program.name} | {self.batch}"
         )
+
+
+class Zone(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class District(models.Model):
+    code = models.PositiveSmallIntegerField(primary_key=True)
+    name = models.CharField(max_length=64)
+    zone = models.ForeignKey(Zone, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.name} ({self.zone.name})"

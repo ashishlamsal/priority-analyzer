@@ -1,4 +1,4 @@
-from rank.models import College, Program, CollegeProgram, Addmission
+from rank.models import College, Program, CollegeProgram, Addmission, District, Zone
 import numpy as np
 import csv
 import os
@@ -6,6 +6,36 @@ import os
 runcolleges = True
 runadmissions = True
 drop = True
+
+
+def populate_zones(zones, drop_zones=False):
+    print("Populating zones...")
+    if drop_zones:
+        print("dropping previous information of zones ...")
+        Zone.objects.all().delete()
+        print("dropping previous information of zones ... success!!")
+
+    for zone in zones:
+        z = Zone(id=int(zone[0]), name=zone[1])
+        z.save()
+    print("Populating zones... success!!")
+
+
+def populate_districts(districts, drop_districts=False):
+    print("Populating districts...")
+    if drop_districts:
+        print("dropping previous information of districts ...")
+        District.objects.all().delete()
+        print("dropping previous information of districts ... success!!")
+
+    for district in districts:
+        d = District(
+            code=int(district[0]),
+            name=district[1],
+            zone=Zone.objects.get(id=int(district[2])),
+        )
+        d.save()
+    print("Populating districts... success!!")
 
 
 def get_cutin_cutoff(RESET=False):
@@ -39,13 +69,24 @@ def get_cutin_cutoff(RESET=False):
             collegeprogram.save(update_fields=["cutin", "cutoff"])
 
 
+def read_csv(file_path):
+    with open(file_path, newline="") as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)
+        table = list(reader)
+    return table
+
+
 def run():
 
     collegeNametoCode = {}
     programNametoCode = {}
     print(os.getcwd())
     collegeCSV = open("./rank/scripts/datas/colleges.csv", newline="")
-    admissionsCSV = open("./rank/scripts/datas/filtered_final.csv", newline="")
+    admissionsCSV = open("./rank/scripts/datas/filtered_final_2.csv", newline="")
+    districts = read_csv("./rank/scripts/datas/district.csv")
+    zones = read_csv("./rank/scripts/datas/zone.csv")
+
     college_table = list(csv.reader(collegeCSV))
     admissions_table = list(csv.reader(admissionsCSV))
 
@@ -55,7 +96,12 @@ def run():
         Program.objects.all().delete()
         CollegeProgram.objects.all().delete()
         Addmission.objects.all().delete()
+        Zone.objects.all().delete()
+        District.objects.all().delete()
         print("dropping previous information of colleges ... success!!")
+
+    populate_zones(zones)
+    populate_districts(districts)
 
     print("populating College, Program and CollegeProgram Models ...")
     collegeName = ""
@@ -152,6 +198,13 @@ def run():
         data["batch"] = 2077
         data["score"] = row[9] if row[9] else -1
         data["rank"] = row[10] if row[10] else -1
+        data["district"] = row[13]
+
+        try:
+            district = District.objects.get(code=int(data["district"]))
+        except (District.DoesNotExist, ValueError):
+            print(f'W: DistrictID={data["district"]} does not exist (default=NULL)')
+            district = None
 
         if runadmissions:
             try:
@@ -169,6 +222,7 @@ def run():
                     quota=data["quota"],
                     score=data["score"],
                     rank=None if data["rank"] == -1 else int(float(data["rank"])),
+                    district=district,
                 )
                 a.save()
             except Exception:
