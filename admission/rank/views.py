@@ -305,7 +305,7 @@ class DistrictView(APIView):
     API endpoint that gives the data based on location provided.
     """
 
-    parser_classes = [JSONParser]
+    parser_classes = [MultiPartParser]
 
     def post(self, request, format=None):
         """we expect location and year from the frontend"""
@@ -339,7 +339,7 @@ class ZoneView(APIView):
     API endpoint that gives the data based on location provided.
     """
 
-    parser_classes = [JSONParser]
+    parser_classes = [MultiPartParser]
 
     def post(self, request, format=None):
         """we expect location and year from the frontend"""
