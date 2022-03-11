@@ -76,7 +76,7 @@ class DistrictSerializer(serializers.ModelSerializer):
 
 class AddmissionSerializer(serializers.ModelSerializer):
     # collegeprogram = CollegeProgramSerializer(read_only=True, many=False)
-    district = DistrictSerializer(many=True, read_only=True)
+    district = DistrictSerializer(many=False, read_only=True)
 
     class Meta:
         model = Addmission

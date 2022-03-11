@@ -310,19 +310,35 @@ class DistrictView(APIView):
         """we expect location and year from the frontend"""
 
         frontendData = request.data
+        print(frontendData)
 
         if frontendData["college"] == "All" and frontendData["faculty"] == "All":
+            resposeData = [
+                {"college": "All colleges"},
+                {"program": "All programs"}
+            ]
             query_result = Addmission.objects.all()
         elif frontendData["college"] == "All":
+            resposeData = [
+                {"college": "All colleges"},
+                {"program": Program.objects.get(code=frontendData["faculty"]).name}
+            ]
             query_result = Addmission.objects.filter(
                 collegeprogram__program__code__exact=frontendData["faculty"]
             )
         elif frontendData["faculty"] == "All":
+            resposeData = [
+                {"college": College.objects.get(code=frontendData["college"]).name},
+                {"program": "All programs"}
+            ]
             query_result = Addmission.objects.filter(
                 collegeprogram__college__code__exact=frontendData["college"]
             )
         else:
-
+            resposeData = [
+                {"college": College.objects.get(code=frontendData["college"]).name},
+                {"program": Program.objects.get(code=frontendData["faculty"]).name}
+            ]
             query_result = Addmission.objects.filter(
                 collegeprogram__college__code__exact=frontendData["college"]
             ).filter(collegeprogram__program__code__exact=frontendData["faculty"])
@@ -330,7 +346,8 @@ class DistrictView(APIView):
         location = query_result.values('district__code', 'district__name').annotate(
             count=Count('district__code')).order_by('-count').exclude(district__isnull=True)
 
-        return Response(location)
+        resposeData.append({"location": location})
+        return Response(resposeData)
 
 
 class ZoneView(APIView):

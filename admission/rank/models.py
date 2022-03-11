@@ -105,6 +105,7 @@ class Addmission(models.Model):
 
 
 class Zone(models.Model):
+    id = models.PositiveSmallIntegerField(primary_key=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
