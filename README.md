@@ -1,6 +1,6 @@
 # Proirity Analyzer
 
-A simple django project for BE Admission Rank and Priority Analyzer
+This repository is a backend for **BE Admission Rank and Priority Analyzer** project. This project was done as an academic project assigned by the Department of Electronics and Computer Engineering, Pulchowk Campus under the subject Database Management System and Software Engineering.
 
 ![Python][Python]&nbsp;
 ![Django][Django]&nbsp;
@@ -9,6 +9,11 @@ A simple django project for BE Admission Rank and Priority Analyzer
 ![CSS][CSS]&nbsp;
 ![Git][Git]&nbsp;
 ![Visual Studio Code][Visual Studio Code]&nbsp;
+
+## Links
+
+> - Frontend : https://github.com/Atomnp/priority-analyser-frontend
+> - Backend : https://github.com/ashishlamsal/priority-analyzer
 
 ## Database Visualization
 
@@ -50,5 +55,5 @@ Detailed documentation of API can be found at `/docs`
 [CSS]: https://img.shields.io/badge/-CSS-1572B6?style=flat-square&logo=CSS3&logoColor=1572B6&logoColor=ffffff
 [Git]: https://img.shields.io/badge/-Git-F05032?style=flat-square&logo=git&logoColor=ffffff
 [Visual Studio Code]: https://img.shields.io/badge/-Visual%20Studio%20Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=ffffff
-[ModelGraph]: ./admission/graphs/rank_models_visualized.svg "Rank Models"
-[RankGraph]: ./admission/graphs/rank_app_visualized.svg "Rank App"
+[ModelGraph]: ./admission/graphs/rank_models_visualized_1.svg "Rank Models"
+[RankGraph]: ./admission/graphs/rank_app_visualized_1.svg "Rank App"
