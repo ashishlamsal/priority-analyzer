@@ -12,8 +12,8 @@ This repository is a backend for **BE Admission Rank and Priority Analyzer** pro
 
 ## Links
 
-> - Frontend : https://github.com/Atomnp/priority-analyser-frontend
-> - Backend : https://github.com/ashishlamsal/priority-analyzer
+> - Frontend : <https://github.com/Atomnp/priority-analyser-frontend>
+> - Backend : <https://github.com/ashishlamsal/priority-analyzer>
 
 ## Database Visualization
 
